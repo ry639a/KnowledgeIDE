@@ -1,0 +1,38 @@
+drop outauthors:Geoffry Hinton, Nikhil SrivastavaResults for: Dropout: a simple way to prevent neural networks from overfitting Srivastava Hinton Krizhevsky Sutskever Salakhutdinov JMLR 2014 summary experiments results MNIST CIFAR ImageNet TIMIT ReutersIdea: 
+- Introduce dropout: during training, randomly “drop” (set to zero) a subset of hidden (and sometimes input) units on each update. This prevents co-adaptation of features, acts as stochastic regularization, and approximates averaging an exponential number of “thinned” networks at test time via simple weight scaling.
+
+Setup:
+- Method: For each training case and layer, multiply activations by an elementwise Bernoulli mask with keep-probability p (typical: p=0.5 for hidden units, ~0.8 for inputs). At test time, use the full network with activations (or weights) scaled by p to match the expected activation during training.
+- Architectures: Fully connected deep nets, convolutional nets, and deep belief network (DBN)–initialized models.
+- Training details often paired with dropout: max-norm constraints on incoming weight vectors, momentum SGD, weight decay, and ReLU/tanh nonlinearities.
+- Conceptual interpretation: 
+  - Model averaging over 2^N subnetworks sharing weights.
+  - Multiplicative Bernoulli noise regularization; for linear models, related to adaptive L2-like penalties.
+
+Experiments:
+- Vision: MNIST, CIFAR-10/100, ImageNet (ILSVRC-2012).
+- Speech: TIMIT phoneme recognition.
+- Text: Reuters (RCV1) document classification.
+- Comparisons: Baselines without dropout, with L1/L2 regularization, early stopping, data augmentation; ablations on keep-probabilities, with/without max-norm; analysis of hidden-unit co-adaptation and representation robustness.
+
+Results:
+- Consistent reductions in test error across domains; enables training larger, higher-capacity networks without overfitting.
+- Vision:
+  - On ImageNet (AlexNet-style convnet), adding dropout to fully connected layers substantially improved top-1/top-5 accuracy relative to the same model without dropout and was critical to the winning 2012 architecture.
+  - On CIFAR and MNIST, dropout outperformed standard weight decay alone and matched or exceeded contemporary state-of-the-art at the time, especially when combined with max-norm and ReLUs.
+- Speech and text:
+  - Reduced phoneme error rates on TIMIT and improved document classification accuracy on Reuters compared to strong baselines.
+- Analysis:
+  - Dropout discourages co-adaptation; hidden units learn features that are useful in multiple contexts.
+  - The simple test-time scaling approximates averaging predictions from many subnetworks with minimal overhead.
+- Practical notes:
+  - Training is noisier and typically slower to converge; requires tuning keep-probabilities and sometimes slightly more epochs.
+  - Inference cost unchanged relative to a single deterministic network.
+
+Further Ideas to explore:
+- Adaptive/learned dropout rates (e.g., Bayesian/variational dropout) and schedules over training.
+- Structured dropout variants: DropConnect (on weights), DropBlock/SpatialDropout for conv layers, stochastic depth for residual networks.
+- Test-time Monte Carlo dropout for uncertainty estimation and calibration.
+- Interplay with modern components: batch/layer normalization, residual/transformer architectures, attention and residual-dropout placement, label smoothing, and data augmentation (mixup/cutout).
+- Task-specific strategies: recurrent/sequence models (variational dropout across timesteps), NLP transformers (attention vs MLP dropout), and vision backbones (where and how much dropout helps in the presence of strong augmentation/regularization).
+- Theoretical angles: sharper generalization bounds under multiplicative noise, connections to flat minima and implicit ensemble diversity.

@@ -1,0 +1,45 @@
+Title:
+Progressive Growing of GANs for Improved Quality, Stability, and Variation
+
+Authors:
+Tero Karras, Timo Aila, Samuli Laine, Jaakko Lehtinen
+
+Idea:
+- Train GANs by progressively increasing image resolution (and correspondingly the depth of generator and discriminator) rather than learning the full-resolution mapping from the start.
+- Use smooth “fade-in” transitions when adding new layers to avoid training shocks.
+- Introduce architectural and optimization refinements—equalized learning rate, pixelwise feature vector normalization in the generator, and a minibatch standard deviation layer in the discriminator—to improve stability and diversity.
+- Propose a multi-scale evaluation metric, the Multi-Scale Sliced Wasserstein Distance (MS-SWD), to quantify fidelity across image scales.
+- Release a new high-quality dataset, CelebA-HQ (30k images at 1024×1024), to benchmark high-resolution synthesis.
+
+Setup:
+- GAN objective: primarily WGAN-GP style training for stability (with gradient penalty), optimized with Adam.
+- Architecture: DCGAN-like convolutional generator and discriminator that start at 4×4 resolution and double to 8×8, 16×16, … up to 1024×1024.
+- Progressive growing schedule: alternate between (1) transition phases where a new higher-resolution block is blended in via a linear fade-in parameter, and (2) stabilization phases with the new resolution fully active.
+- Stabilization techniques:
+  - Equalized learning rate (runtime weight scaling) for consistent learning dynamics across layers.
+  - Pixelwise feature vector normalization in the generator instead of batch norm.
+  - Minibatch standard deviation layer in the discriminator to encourage variation and reduce mode collapse.
+- Datasets: CelebA-HQ (introduced in the paper), LSUN Bedrooms, and other LSUN categories; comparisons against non-progressive baselines at matched parameter counts and training budgets.
+- Metrics: MS-SWD as the primary quantitative measure; qualitative visualizations (interpolations, attribute changes) to assess smoothness and diversity.
+
+Experiments:
+- Compare progressive growing vs. fixed-resolution training across multiple datasets and resolutions.
+- Ablations on the proposed techniques (fade-in vs. hard switch; with/without equalized LR; with/without pixel norm; with/without minibatch stddev layer).
+- Measure convergence speed and final quality using MS-SWD across Laplacian pyramid scales.
+- Demonstrate smooth latent-space interpolations and semantic consistency across resolutions.
+- Showcase 1024×1024 generations on CelebA-HQ and high-res scene synthesis on LSUN.
+
+Results:
+- Progressive growing significantly improves training stability and final image quality, especially at high resolutions.
+- Faster convergence to higher-quality solutions compared to training at full resolution from scratch.
+- The combination of equalized learning rate, pixelwise normalization, and minibatch stddev further reduces artifacts and mode collapse.
+- High-fidelity, diverse 1024×1024 face images on CelebA-HQ and compelling large images on LSUN.
+- MS-SWD indicates consistent improvements across scales; qualitative results (interpolations, attribute variation) show smooth, semantically meaningful control.
+
+Further Ideas to explore:
+- Apply progressive growing to modern GAN objectives and architectures (e.g., non-saturating loss with gradient penalties, spectral norm, or modern discriminators) to isolate its contribution in contemporary settings.
+- Investigate dynamic or data-driven schedules for when to grow resolution, rather than fixed transition/stabilization durations.
+- Extend progressive training to modalities beyond images (audio, video) and to conditional settings (class-conditional, text-to-image).
+- Combine with style-based architectures (e.g., StyleGAN) to study how progressive growing interacts with style control, path-length regularization, and mixing regularization.
+- Explore improved multi-scale metrics (e.g., FID/KID per scale, precision–recall/coverage) to complement MS-SWD and better capture trade-offs between fidelity and diversity.
+- Study curriculum designs that also progressively increase task complexity (augmentations, frequency content) alongside resolution to further stabilize training.

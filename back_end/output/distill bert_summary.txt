@@ -1,0 +1,33 @@
+distill bertauthors:Victor SANHResults for: DistilBERT paper Victor Sanh Lysandre Debut Julien Chaumond Thomas Wolf arXiv pdfResults for: "DistilBERT, a distilled version of BERT" arXiv pdfIdea:
+- Compress BERT via knowledge distillation performed during pretraining, yielding a smaller Transformer (DistilBERT) that is faster and lighter while preserving most of BERT’s accuracy.
+- Remove next sentence prediction (NSP) and simplify the architecture (no token-type embeddings, no pooler) to streamline the model.
+
+Setup:
+- Teacher: BERT-base (12 layers, 12 heads, 768 hidden).
+- Student: 6-layer Transformer with same hidden size (768), 12 heads, 3072 FFN; same WordPiece tokenizer and vocabulary; token-type embeddings and pooler removed.
+- Initialization: copy every other layer from the teacher to initialize the student.
+- Training objective (pretraining-time distillation):
+  - Distillation loss: cross-entropy on teacher’s soft targets with temperature T≈2.
+  - Masked language modeling (MLM) loss on ground-truth tokens.
+  - Cosine embedding loss aligning student and teacher hidden states.
+  - Weighted sum (reported weights in paper): KD dominant, with auxiliary MLM and cosine terms.
+- Data: same as BERT’s original pretraining (English Wikipedia + BookCorpus).
+- Fine-tuning: standard task-specific heads on top of DistilBERT for downstream tasks.
+
+Experiments:
+- Benchmarks: GLUE suite; SQuAD v1.1 and v2.0; speed and parameter comparisons.
+- Baselines: BERT-base; a comparable 6-layer model trained without distillation; ablations removing each loss term and different initializations.
+- Metrics: accuracy/F1 per task; aggregate GLUE score; inference speed (throughput/latency); parameter count.
+
+Results:
+- Model efficiency: ~40% fewer parameters than BERT-base (~66M vs ~110M); ~60% faster inference.
+- Accuracy retention: ~97% of BERT-base performance on GLUE while being substantially smaller and faster.
+- QA: small drop vs BERT-base on SQuAD (F1 within a few points), maintaining competitive performance.
+- Ablations: all three loss components contribute; initializing the student from every other teacher layer improves stability and accuracy over random init; distillation during pretraining markedly outperforms training the small model from scratch.
+
+Further Ideas to explore:
+- Distill from stronger teachers (RoBERTa, DeBERTa, or task-ensembles) and multilingual teachers for mDistilBERT variants.
+- Combine with complementary compression: quantization, structured pruning, low-rank factorization, or weight sharing.
+- Progressive or layer-wise distillation schedules; attention-map and intermediate-representation matching beyond final hidden states.
+- Domain-adaptive distillation for specialized corpora (biomedical, legal) and task-aware distillation during fine-tuning.
+- Early-exit mechanisms and mixture-of-experts for adaptive compute; energy and on-device benchmarks to optimize for mobile/edge deployment.

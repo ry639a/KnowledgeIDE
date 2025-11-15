@@ -1,0 +1,53 @@
+attention is all you needauthors:Geoffrey HintonResults for: "Attention Is All You Need" paper Vaswani 2017 arXivIdea: 
+- Introduce the Transformer, a sequence transduction architecture that relies entirely on self-attention, dispensing with recurrence and convolution.
+- Core mechanisms: scaled dot-product attention, multi-head attention to capture diverse relations, positional encodings to inject order, and a stacked encoder–decoder with residual connections and layer normalization.
+- Motivation: enable full parallelism across sequence positions, reduce path length between distant tokens, and improve efficiency and translation quality.
+
+Setup:
+- Tasks: Neural machine translation on WMT 2014 English→German (En→De) and English→French (En→Fr).
+- Data/Preprocessing: Word-piece/BPE vocabulary ≈32k; training on standard WMT14 train sets, validation on newstest2013, test on newstest2014.
+- Model configs:
+  - Transformer-Base: 6 encoder and 6 decoder layers; d_model=512; d_ff=2048; 8 attention heads; dropout 0.1; sinusoidal positional encodings; shared target embeddings and softmax weights.
+  - Transformer-Big: d_model=1024; d_ff=4096; 16 heads; dropout 0.3.
+- Optimization: Adam (β1=0.9, β2=0.98, ε=1e-9); custom learning-rate schedule with 4000-step warmup and inverse-square-root decay; label smoothing ε_ls=0.1.
+- Decoding: Beam search (beam=4) with length penalty α=0.6; masked self-attention in the decoder to prevent access to future tokens.
+- Compute: Trained on 8 GPUs; Base ~12 hours; Big ~3.5 days.
+
+Experiments:
+- Main comparisons against strong RNN/CNN-based NMT systems (e.g., GNMT, ConvS2S).
+- Ablations on: number of attention heads, model depth/width, learned vs sinusoidal positional encodings, effect of dropout and label smoothing.
+- Efficiency analyses: training speed, parallelism, and computational cost per token.
+- Qualitative analyses of attention heads to illustrate learned linguistic relations (e.g., syntactic dependencies, coreference-like links).
+
+Results:
+- Translation quality (BLEU, WMT14 test):
+  - En→De: Base 27.3; Big 28.4 (state-of-the-art at publication time).
+  - En→Fr: Base 38.1; Big 41.8 (state-of-the-art at publication time).
+- Efficiency:
+  - Substantially faster training than RNN-based models due to full parallelism across sequence positions.
+  - Fewer operations to relate distant tokens; improved path length compared to RNNs/CNNs.
+- Ablations:
+  - More attention heads improved quality up to the chosen configurations.
+  - Both learned and sinusoidal positional encodings work; sinusoidal chosen for simplicity.
+  - Label smoothing and residual dropout materially improved generalization.
+
+Further Ideas to explore:
+- Positional information:
+  - Relative and rotary positional embeddings to better capture long-range order.
+  - Learnable dynamic position biases conditioned on content.
+- Efficiency and scaling:
+  - Sparse/linear-time attention mechanisms for longer contexts.
+  - Mixed-precision, activation recomputation, and tensor/sequence parallelism for larger models.
+- Structure and inductive biases:
+  - Syntax/structure-aware attention or auxiliary parsing objectives.
+  - Memory-augmented variants for very long sequences.
+- Training and regularization:
+  - Advanced optimization schedules, better adaptive optimizers, or second-order approximations.
+  - Data augmentation and multilingual training for transfer and robustness.
+- Applications beyond text:
+  - Cross-modal and vision/audio Transformers; unified architectures for multi-task learning.
+- Decoding and objective:
+  - Alternative training objectives (e.g., sequence-level learning, minimum risk training).
+  - Improved decoding strategies (e.g., constrained decoding, calibration and uncertainty estimation).
+
+Note: The paper “Attention Is All You Need” is by Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, and Illia Polosukhin (NeurIPS 2017; arXiv:1706.03762). It is not authored by Geoffrey Hinton.

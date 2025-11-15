@@ -1,0 +1,30 @@
+distil bertauthors:Victor SANHResults for: DistilBERT paper authors Victor Sanh Lysandre Debut Julien Chaumond Thomas Wolf arXiv 1910.01108Results for: "DistilBERT, a distilled version of BERT: smaller, faster, cheaper and lighter" 97% GLUE 60% faster 40% smaller arXivResults for: DistilBERT, a distilled version of BERT: smaller, faster, cheaper and lighter arXiv pdfResults for: DistilBERT GLUE results 60% faster 40% smaller 97% performanceIdea:
+- Compress BERT into a lighter Transformer via knowledge distillation, retaining most of its language understanding while reducing latency and memory. The student model (DistilBERT) has half the layers of BERT base and is trained to mimic the teacher’s behavior during pre-training, yielding a model that is smaller, faster, and nearly as accurate.
+
+Setup:
+- Teacher: BERT base (12 layers, 768 hidden size, 12 heads).
+- Student: 6-layer Transformer with the same hidden size and number of attention heads; initialized by copying every other layer from the teacher to preserve depth-wise knowledge.
+- Objectives: Combined loss with (a) distillation on the teacher’s soft logits (temperature scaling), (b) cosine embedding loss aligning intermediate hidden states between teacher and student, and (c) standard cross-entropy when supervised labels are available.
+- Pre-training: Performed on the same unlabeled corpora as BERT (e.g., BookCorpus + English Wikipedia), focusing on masked language modeling and removing the next sentence prediction objective.
+- Fine-tuning: Standard downstream tasks (e.g., GLUE benchmark; also QA like SQuAD) to compare against BERT base and smaller baselines.
+- Efficiency metrics: Parameter count, memory footprint, and inference speed on CPU/GPU.
+
+Experiments:
+- Train DistilBERT with the combined distillation objective and layer-wise initialization.
+- Evaluate on GLUE tasks (MNLI, QNLI, QQP, SST-2, MRPC, RTE, CoLA, STS-B) and reading comprehension (e.g., SQuAD v1.1).
+- Measure throughput and latency improvements, and report parameter reductions.
+- Ablations: effect of removing cosine loss, removing distillation, different temperatures, random vs teacher-based initialization, and removing NSP.
+
+Results:
+- Retains about 97% of BERT base performance on GLUE while being approximately 60% faster at inference and about 40% smaller in parameters.
+- Maintains competitive performance on SQuAD with a modest drop relative to BERT base.
+- Ablations indicate that (i) distillation from teacher soft targets and (ii) hidden-state alignment (cosine loss) both materially contribute to closing the accuracy gap; initializing student layers from the teacher (every other layer) further boosts stability and final quality.
+- Removing NSP in pre-training does not harm downstream performance in this setup.
+
+Further Ideas to explore:
+- Distill from stronger teachers (e.g., RoBERTa, DeBERTa) and multilingual teachers for cross-lingual students.
+- Combine distillation with quantization and structured pruning for additional on-device gains.
+- Task-specific and multi-task distillation schedules (progressive or curriculum-based) to tailor students for target applications.
+- Explore architectural variations for students (e.g., narrower width, fewer attention heads, sharing parameters, or dynamic-depth/early-exit) guided by distillation.
+- Domain-adaptive distillation where the teacher is first adapted to a target domain, then distilled to a compact student.
+- Layer-wise or token-wise adaptive distillation that emphasizes harder examples or more informative layers.

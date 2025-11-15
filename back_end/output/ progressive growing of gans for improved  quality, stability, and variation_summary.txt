@@ -1,0 +1,52 @@
+Title:
+Progressive Growing of GANs for Improved Quality, Stability, and Variation
+
+Authors:
+Tero Karras, Timo Aila, Samuli Laine, Jaakko Lehtinen
+
+Idea:
+- Train GANs with a curriculum on image resolution: start from very low resolution and progressively add layers to both generator and discriminator, smoothly “fading in” each higher-resolution block.
+- Stabilize and speed up training with architectural/optimization tweaks: equalized learning rate, pixelwise feature vector normalization in the generator, and a minibatch standard-deviation layer in the discriminator.
+- Propose a multi-scale, patch-based evaluation metric (sliced Wasserstein distance, SWD) to assess fidelity and diversity across image scales.
+- Introduce CelebA-HQ, a 1024×1024 high-quality face dataset derived from CelebA.
+
+Setup:
+- Progressive curriculum:
+  - Begin at 4×4 resolution; double to 8×8, 16×16, … up to 1024×1024.
+  - When adding a new block, linearly fade in its contribution (blend old and new paths) to avoid training shocks; then stabilize at the new resolution.
+- Architecture/training details:
+  - Generator: nearest-neighbor upsampling followed by 3×3 convolutions; LeakyReLU activations; pixelwise feature vector normalization after convs to control signal magnitudes.
+  - Discriminator: 3×3 convolutions with downsampling by average pooling; add a “minibatch standard deviation” feature map to encourage sample diversity.
+  - Equalized learning rate: per-layer weight scaling so all layers learn at comparable speeds.
+  - Loss/optimizer: primarily WGAN-GP (Wasserstein with gradient penalty), with Adam (β1=0, β2=0.99) and a constant learning rate; results also robust with the non-saturating GAN loss.
+  - Batch size decreases as resolution increases due to memory; feature map count tapers with resolution.
+- Data:
+  - Unconditional generation on CelebA-HQ (1024×1024) and LSUN categories (e.g., Bedrooms, Churches, Cats, Cars), at resolutions up to 1024×1024 depending on dataset.
+
+Experiments:
+- Compare progressive growing versus fixed-architecture training at full resolution.
+- Ablations of:
+  - Fade-in transitions.
+  - Equalized learning rate.
+  - Pixelwise normalization in the generator.
+  - Minibatch standard-deviation layer in the discriminator.
+  - Choice of loss (WGAN-GP vs non-saturating).
+- Evaluation with:
+  - Sliced Wasserstein Distance (SWD) across Laplacian pyramid scales using local patch distributions.
+  - Standard GAN metrics (e.g., FID/IS) for reference.
+- Qualitative analyses: high-res samples, interpolations, robustness across datasets.
+
+Results:
+- Substantially improved stability and sample quality, especially at high resolutions (up to 1024×1024).
+- Faster convergence and fewer artifacts relative to training a full-resolution network from scratch.
+- Consistent improvements in SWD across scales and better FID/IS compared to baselines.
+- Ablations show each proposed component contributes: progressive fade-in and equalized LR aid stability; pixelwise normalization prevents signal escalation in G; minibatch std layer improves diversity and reduces mode collapse.
+- CelebA-HQ enables sharp, detailed face synthesis at megapixel scale.
+
+Further Ideas to explore:
+- Generalize progressive curricula to other modalities (audio, video) and to conditional or multimodal GANs.
+- Adaptive progression schedules learned from training dynamics rather than fixed stage lengths.
+- Combine progressive growing with modern regularizers (e.g., path-length/spectral normalization), augmentation strategies, and diffusion-style objectives.
+- Alternative multi-scale discriminators or generators that share features across resolutions without explicit growth.
+- Improved, perception-aligned multi-scale metrics beyond SWD for high-resolution evaluation.
+- Style- and content-factorized architectures (later realized in StyleGAN) integrated with progressive training.

@@ -1,0 +1,1 @@
+I don’t have the paper details yet. Please provide the title, link/DOI/arXiv ID, or paste the abstract. If you meant “Learning Precise Timing with LSTM Recurrent Networks” (Gers, Schraudolph, Schmidhuber, 2002) introducing peephole connections, I can summarize that—please confirm.

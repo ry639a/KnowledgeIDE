@@ -1,0 +1,11 @@
+kiamingauthors:Kiaming HeI don’t see the paper title or link. Did you mean a paper by Kaiming He? Please provide the exact title or a link.
+
+If you’re unsure, here are common options—pick one and I’ll summarize it in the requested format:
+- Deep Residual Learning for Image Recognition (ResNet, 2015)
+- Identity Mappings in Deep Residual Networks (2016)
+- Mask R-CNN (2017)
+- Rethinking ImageNet Pre-training (2018/2019)
+- Delving Deep into Rectifiers: Surpassing Human-Level Performance on ImageNet Classification (PReLU, 2015)
+- Spatial Pyramid Pooling in Deep Convolutional Networks (SPPnet, 2014)
+
+If you don’t choose, I can default to summarizing “Deep Residual Learning for Image Recognition.”

@@ -1,0 +1,15 @@
+.page-container {
+  display: flex;            /* Arrange children horizontally */
+  width: 100%;
+  height: 100%;            /* Full viewport height */
+}
+
+.left-panel {
+  flex: 1;                  /* Takes 50% width */
+  padding: 2px;      /* Scroll if content overflows */
+}
+
+.right-panel {
+  flex: 1;                  /* Takes the other 50% */
+  padding: 2px;
+}
