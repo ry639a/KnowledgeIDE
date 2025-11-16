@@ -38,7 +38,6 @@ Summary is in a structured format and contains below key sections:
 
 Sample summary for the infamous "Attention is all you need" paper:
 
-""" 
     Title:
     Attention Is All You Need
     
@@ -64,7 +63,7 @@ Sample summary for the infamous "Attention is all you need" paper:
     - Training:
       - Adam optimizer with a custom learning-rate schedule (warmup then inverse-sqrt decay)
       - Label smoothing (ε≈0.1)
-      - Parallel training on 8 GPUs; highly parallelizable due to no recurrence """
+      - Parallel training on 8 GPUs; highly parallelizable due to no recurrence.
 
 
 #### Insights extraction:
